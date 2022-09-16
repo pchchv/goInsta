@@ -31,6 +31,7 @@ func getEnvValue(v string) string {
 }
 
 func main() {
+	var userId string
 	flag.Parse()
 	if *instaName == "" {
 		log.Fatal("You need to input -n=name")
@@ -45,4 +46,14 @@ func main() {
 	// Get User info
 	client = instagram.NewClient(nil)
 	client.ClientID = ClientID
+	// Search Users
+	searchUsers, _, err := client.Users.Search(input, nil)
+	for _, user := range searchUsers {
+		if user.Username == input {
+			userId = user.ID
+		}
+	}
+	if userId == "" {
+		log.Fatalln("Can not address user name: ", input, err)
+	}
 }
