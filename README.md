@@ -1,2 +1,1 @@
-# goInsta
-Download your Instagram photos
+# Download your Instagram photos
