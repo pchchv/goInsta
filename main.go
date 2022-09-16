@@ -2,12 +2,14 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"path/filepath"
+
+	"github.com/gedex/go-instagram/instagram"
 )
 
 var instaName = flag.String("n", "", "Instangram user name such as: 'pchchv'")
+var client *instagram.Client
 
 func main() {
 	flag.Parse()
@@ -20,5 +22,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(baseDir)
+
+	// Get User info
+	client = instagram.NewClient(nil)
 }
