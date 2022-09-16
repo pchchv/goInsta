@@ -12,6 +12,7 @@ import (
 
 var instaName = flag.String("n", "", "Instangram user name such as: 'pchchv'")
 var client *instagram.Client
+var ClientID string
 
 func init() {
 	// Load values from .env into the system
@@ -40,7 +41,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
+	ClientID = getEnvValue("INSTAGRAMID")
 	// Get User info
 	client = instagram.NewClient(nil)
+	client.ClientID = ClientID
 }
