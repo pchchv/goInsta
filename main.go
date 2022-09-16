@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -56,4 +57,6 @@ func main() {
 	if userId == "" {
 		log.Fatalln("Can not address user name: ", input, err)
 	}
+	userFolderName := fmt.Sprintf("[%s]%s", userId, input)
+	fmt.Println("Starting download [", userId, "]", input)
 }
