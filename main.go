@@ -31,6 +31,8 @@ func getEnvValue(v string) string {
 	return value
 }
 
+func FindPhotos(ownerName string, albumName string, userId string, baseDir string) {}
+
 func main() {
 	var userId string
 	flag.Parse()
@@ -59,4 +61,5 @@ func main() {
 	}
 	userFolderName := fmt.Sprintf("[%s]%s", userId, input)
 	fmt.Println("Starting download [", userId, "]", input)
+	FindPhotos(userFolderName, input, userId, baseDir)
 }
