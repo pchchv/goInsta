@@ -16,7 +16,9 @@ import (
 
 var instaName = flag.String("n", "", "Instangram user name such as: 'pchchv'")
 var client *instagram.Client
+var FileIndex int = 0
 var ClientID string
+var m sync.Mutex
 
 func init() {
 	// Load values from .env into the system
@@ -32,6 +34,14 @@ func getEnvValue(v string) string {
 		log.Panicf("Value %v does not exist", v)
 	}
 	return value
+}
+
+func GetFileIndex() (ret int) {
+	m.Lock()
+	ret = FileIndex
+	FileIndex = FileIndex + 1
+	m.Unlock()
+	return ret
 }
 
 func DownloadWorker(destDir string, linkChan chan string, wg *sync.WaitGroup) {
