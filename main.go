@@ -94,6 +94,13 @@ func FindPhotos(ownerName string, albumName string, userId string, baseDir strin
 	//Create folder
 	dir := fmt.Sprintf("%v/%v", baseDir, ownerName)
 	os.MkdirAll(dir, 0755)
+	linkChan := make(chan string)
+	//Create download worker
+	wg := new(sync.WaitGroup)
+	for i := 0; i < 1; i++ {
+		wg.Add(1)
+		go DownloadWorker(dir, linkChan, wg)
+	}
 }
 
 func main() {
