@@ -4,10 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"image"
+	"image/jpeg"
+	"image/png"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/gedex/go-instagram/instagram"
@@ -47,6 +50,12 @@ func GetFileIndex() (ret int) {
 func DownloadWorker(destDir string, linkChan chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for target := range linkChan {
+		var imageType string
+		if strings.Contains(target, ".png") {
+			imageType = ".png"
+		} else {
+			imageType = ".jpg"
+		}
 		resp, err := http.Get(target)
 		if err != nil {
 			log.Println("Http.Get\nerror: " + err.Error() + "\ntarget: " + target)
@@ -57,6 +66,26 @@ func DownloadWorker(destDir string, linkChan chan string, wg *sync.WaitGroup) {
 		if err != nil {
 			log.Println("image.Decode\nerror: " + err.Error() + "\ntarget: " + target)
 			continue
+		}
+		// Ignore small images
+		bounds := m.Bounds()
+		if bounds.Size().X > 300 && bounds.Size().Y > 300 {
+			imgInfo := fmt.Sprintf("pic%04d", GetFileIndex())
+			out, err := os.Create(destDir + "/" + imgInfo + imageType)
+			if err != nil {
+				log.Printf("os.Create\nerror: %s", err)
+				continue
+			}
+			defer out.Close()
+			if imageType == ".png" {
+				png.Encode(out, m)
+			} else {
+				jpeg.Encode(out, m, nil)
+			}
+
+			if FileIndex%30 == 0 {
+				fmt.Println(FileIndex, " photos downloaded.")
+			}
 		}
 	}
 }
