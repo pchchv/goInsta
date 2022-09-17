@@ -31,7 +31,11 @@ func getEnvValue(v string) string {
 	return value
 }
 
-func FindPhotos(ownerName string, albumName string, userId string, baseDir string) {}
+func FindPhotos(ownerName string, albumName string, userId string, baseDir string) {
+	//Create folder
+	dir := fmt.Sprintf("%v/%v", baseDir, ownerName)
+	os.MkdirAll(dir, 0755)
+}
 
 func main() {
 	var userId string
