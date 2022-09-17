@@ -3,9 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"image"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/gedex/go-instagram/instagram"
 	"github.com/joho/godotenv"
@@ -29,6 +32,23 @@ func getEnvValue(v string) string {
 		log.Panicf("Value %v does not exist", v)
 	}
 	return value
+}
+
+func DownloadWorker(destDir string, linkChan chan string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for target := range linkChan {
+		resp, err := http.Get(target)
+		if err != nil {
+			log.Println("Http.Get\nerror: " + err.Error() + "\ntarget: " + target)
+			continue
+		}
+		defer resp.Body.Close()
+		m, _, err := image.Decode(resp.Body)
+		if err != nil {
+			log.Println("image.Decode\nerror: " + err.Error() + "\ntarget: " + target)
+			continue
+		}
+	}
 }
 
 func FindPhotos(ownerName string, albumName string, userId string, baseDir string) {
