@@ -91,6 +91,11 @@ func DownloadWorker(destDir string, linkChan chan string, wg *sync.WaitGroup) {
 }
 
 func FindPhotos(ownerName string, albumName string, userId string, baseDir string) {
+	var next *instagram.ResponsePagination
+	var optParam *instagram.Parameters
+	var mediaList []instagram.Media
+	totalPhotoNum := 1
+	var err error
 	//Create folder
 	dir := fmt.Sprintf("%v/%v", baseDir, ownerName)
 	os.MkdirAll(dir, 0755)
@@ -100,6 +105,25 @@ func FindPhotos(ownerName string, albumName string, userId string, baseDir strin
 	for i := 0; i < 1; i++ {
 		wg.Add(1)
 		go DownloadWorker(dir, linkChan, wg)
+	}
+	for {
+		maxId := ""
+		if next != nil {
+			maxId = next.NextMaxID
+		}
+		optParam = &instagram.Parameters{Count: 10, MaxID: maxId}
+		mediaList, next, err = client.Users.RecentMedia(userId, optParam)
+		if err != nil {
+			log.Printf("ERROR:  %v\n", err)
+			break
+		}
+		for _, media := range mediaList {
+			totalPhotoNum++
+			linkChan <- media.Images.StandardResolution.URL
+		}
+		if len(mediaList) == 0 || next.NextMaxID == "" {
+			break
+		}
 	}
 }
 
